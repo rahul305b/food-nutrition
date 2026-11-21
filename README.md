@@ -1,76 +1,55 @@
-# Rahul Shankar's Food Nutrition Calculator for Dialysis Patients 🥗
+# Renal Food Nutrition Calculator
 
-This is a JavaFX-based desktop application designed to help dialysis patients track the potassium content in their meals. The application allows users to add ingredients, specify their weight, and instantly view the total potassium content of the dish.
+A JavaFX desktop application for estimating the potassium, phosphorus and sodium contributed by the ingredients in a dish. It is intended as a calculation and tracking aid for people who need to monitor dietary minerals, including people receiving dialysis.
 
----
+## Current features
 
-## 🛠 Features
+- Enter a dish name and add multiple food ingredients.
+- Enter the weight of each ingredient in grams.
+- Calculate potassium, phosphorus and sodium for each ingredient and for the complete dish.
+- Remove ingredients and add them again; duplicate ingredient rows are prevented.
+- Maintain a local food catalogue: add, update and delete foods and nutrient values per 100 g.
+- Persist the food catalogue automatically in a local SQLite database.
+- Treat unentered nutrient values as unknown. If any ingredient is missing a value for a nutrient, the dish total for that nutrient is shown as **Incomplete data**, not as zero.
 
-- Enter dish name and add multiple ingredients.
-- Calculate potassium content based on the weight of each ingredient.
-- Prevent duplicate ingredient entries in a single dish.
-- Delete selected ingredients and re-enable them for future selection.
-- View real-time updates of total potassium content.
-- User-friendly interface with JavaFX TableView and ComboBox.
+## Technology
 
----
-
-## 💡 Technologies Used
-
-- Java 17+
-- JavaFX
-- FXML
+- Java 23
+- JavaFX 23
 - Maven
+- SQLite (local database)
 
----
+## Run
 
-## 🚀 How to Run
+Prerequisites: JDK 23 and Maven.
 
-### Prerequisites
+From the foodnutrition directory, run:
 
-- JDK 17 or higher installed
-- Maven installed
-- JavaFX SDK (configured if needed)
+    mvn clean javafx:run
 
-### Steps
+The SQLite database is created automatically under the current user's home directory:
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/food-nutrition-dialysis.git
-   cd food-nutrition-dialysis
+- Windows: %USERPROFILE%\.foodnutrition\foodnutrition.db
+- Linux/macOS: ~/.foodnutrition/foodnutrition.db
 
-2.Run the application using Maven:
--mvn clean javafx:run
-ℹ️ Make sure your pom.xml includes the javafx-maven-plugin.
+No PostgreSQL server, database username or password is needed.
 
-📁 Project Structure
+## Food data
 
-src/
- └── main/
-     ├── java/
-     │    └── com.rahulshankar.dialysisapp/
-     │          └── controllers/
-     │               └── FoodPreparationController.java
-     ├── resources/
-     │    └── fxml/
-     │         └── FoodPreparationUI.fxml
-     └── App.java (Main application entry)
+The application seeds the three potassium values already present in the original project (onion, tomato and potato). These are retained for backward continuity and are **not certified clinical reference values**. Phosphorus and sodium are left blank until verified data is entered.
 
+Use **Manage Food Catalogue** to add or correct foods. All nutrient entries must be in milligrams per 100 grams of edible food. Leave a field blank when its value is not known; do not enter zero as a substitute for missing data.
 
-🧠 How It Works
-Each ingredient has a predefined potassium value per 100g.
+Food composition varies with variety, brand, edible portion, preparation and cooking method. Verify catalogue values against a reliable food-composition source and have a renal dietitian or treating clinician review any dietary use.
 
-When the user adds an ingredient and specifies weight, potassium is calculated as:
+## Scope and safety
 
-Copy
-Edit
-(PotassiumPer100g * Weight) / 100
-All added ingredients are shown in a table.
+This program performs arithmetic using food values supplied by the user. It does not prescribe a renal diet, set personal nutrient limits, model cooking losses, or replace advice from a renal dietitian or clinician. Calculated values are estimates and should not be used as the sole basis for treatment or dietary decisions.
 
-The total potassium is dynamically calculated on submission.
+## Data and privacy
 
-🙋‍♂️ Author
-Rahul Shankar
-🔗 LinkedIn
-📧 https://www.linkedin.com/in/rahul-s-6a9a3a91/
+Food catalogue data is stored locally on the computer under the current user's home directory. The app does not upload food entries or meal information to a server.
 
+## Author
+
+Rahul Shankar — https://github.com/rahul305b

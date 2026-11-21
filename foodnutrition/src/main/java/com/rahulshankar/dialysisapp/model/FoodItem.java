@@ -1,32 +1,34 @@
 package com.rahulshankar.dialysisapp.model;
 
+/** Nutrient composition per 100 grams. Null means unknown, not zero. */
 public class FoodItem {
-    private String foodName;
-    private String category;
-    private int phosphorus;
-    private int potassium;
-    private int sodium;
+    private final String name;
+    private final String category;
+    private final Double potassiumMgPer100g;
+    private final Double phosphorusMgPer100g;
+    private final Double sodiumMgPer100g;
 
-    public FoodItem(String foodName, String category, int phosphorus, int potassium, int sodium) {
-        this.foodName = foodName;
+    public FoodItem(String name, String category, Double potassiumMgPer100g,
+                    Double phosphorusMgPer100g, Double sodiumMgPer100g) {
+        this.name = name;
         this.category = category;
-        this.phosphorus = phosphorus;
-        this.potassium = potassium;
-        this.sodium = sodium;
+        this.potassiumMgPer100g = potassiumMgPer100g;
+        this.phosphorusMgPer100g = phosphorusMgPer100g;
+        this.sodiumMgPer100g = sodiumMgPer100g;
     }
 
-    public String getFoodName() { return foodName; }
-    public void setFoodName(String foodName) { this.foodName = foodName; }
-
+    public String getName() { return name; }
     public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public Double getPotassiumMgPer100g() { return potassiumMgPer100g; }
+    public Double getPhosphorusMgPer100g() { return phosphorusMgPer100g; }
+    public Double getSodiumMgPer100g() { return sodiumMgPer100g; }
 
-    public int getPhosphorus() { return phosphorus; }
-    public void setPhosphorus(int phosphorus) { this.phosphorus = phosphorus; }
+    // Compatibility getters for earlier code that used FoodItem.
+    public String getFoodName() { return name; }
+    public int getPotassium() { return potassiumMgPer100g == null ? 0 : potassiumMgPer100g.intValue(); }
+    public int getPhosphorus() { return phosphorusMgPer100g == null ? 0 : phosphorusMgPer100g.intValue(); }
+    public int getSodium() { return sodiumMgPer100g == null ? 0 : sodiumMgPer100g.intValue(); }
 
-    public int getPotassium() { return potassium; }
-    public void setPotassium(int potassium) { this.potassium = potassium; }
-
-    public int getSodium() { return sodium; }
-    public void setSodium(int sodium) { this.sodium = sodium; }
+    @Override
+    public String toString() { return name; }
 }
