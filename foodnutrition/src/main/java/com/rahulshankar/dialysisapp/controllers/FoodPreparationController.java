@@ -285,6 +285,8 @@ public class FoodPreparationController {
         }
     }
 
+    public void refreshFoodCatalogueAfterImport() throws Exception { reloadFoods(); }
+
     private void reloadFoods() throws Exception {
         foodItems.setAll(catalog.findAll());
         updateAvailableFoods();
