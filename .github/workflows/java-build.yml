@@ -1,0 +1,26 @@
+name: Java Build Verification
+
+on:
+  push:
+    branches:
+      - feature/demo-food-importer
+  pull_request:
+    branches:
+      - master
+      - feature/demo-food-importer
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java 23
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '23'
+          cache: maven
+      - name: Compile and package
+        run: mvn -f foodnutrition/pom.xml --batch-mode clean package
