@@ -53,3 +53,27 @@ Food catalogue data is stored locally on the computer under the current user's h
 ## Author
 
 Rahul Shankar — https://github.com/rahul305b
+## Demo food profile importer
+
+The demo importer is intended for software testing and UI demonstrations only. It stores records in a separate SQLite database:
+
+- `~/.foodnutrition/foodnutrition-demo.db`
+
+It does **not** add demo records to the food catalogue used by the nutrition calculator. Demo profile data must not be used for dietary planning, clinical decisions, or patient care.
+
+Open **Manage Food Catalogue** and use **View Imported Profiles** to view imported demo records. The profile window provides a confirmed delete-all action that removes demo records only.
+
+### CSV format
+
+The importer requires these headers (the column order can vary):
+
+`demo_id,food_name,local_name_tamil,category,preparation,basis,energy_kcal,protein_g,carbohydrates_g,fat_g,fibre_g,potassium_mg,phosphorus_mg,sodium_mg,calcium_mg,magnesium_mg,iron_mg,data_source,source_record_id,data_status,citation,license_note`
+
+- Each `demo_id` must be unique within the imported database.
+- Nutrient values must be finite, non-negative numeric values or blank (unknown).
+- Blank and `N/A` values are treated as unknown.
+- The importer validates the required headers and row field count.
+- Duplicate IDs are skipped.
+- The demo database is independent of `foodnutrition.db`.
+
+**Safety notice:** Demo data values may be fabricated. They are explicitly marked as synthetic test data and must never be interpreted as nutrition guidance.
