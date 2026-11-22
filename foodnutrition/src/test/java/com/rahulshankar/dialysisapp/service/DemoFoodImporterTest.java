@@ -38,7 +38,7 @@ class DemoFoodImporterTest {
 
     @Test void malformedRowRollsBackEntireImport() throws Exception {
         withHome(() -> {
-            String bad=ROW.replace(",111,222,333,",",not-a-number,222,333,");
+            String bad=ROW.replace("D1,","D2,").replace(",111,222,333,",",not-a-number,222,333,");
             assertThrows(Exception.class,()->new DemoFoodImporter().importCsv(stream(HEADER+"\\n"+ROW+"\\n"+bad+"\\n")));
             assertTrue(new DemoFoodProfileService().findProfiles().isEmpty(),
                     "A failed batch should leave no partially imported profiles.");
