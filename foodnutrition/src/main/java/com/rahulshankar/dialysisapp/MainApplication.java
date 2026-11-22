@@ -1,6 +1,5 @@
 package com.rahulshankar.dialysisapp;
 
-import com.rahulshankar.dialysisapp.controllers.FoodPreparationController;
 import com.rahulshankar.dialysisapp.service.DemoFoodImporter;
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -19,7 +18,6 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/FoodPreparationUI.fxml"));
         BorderPane root = loader.load();
-        FoodPreparationController controller = loader.getController();
         VBox top=(VBox)root.getTop();
         Button importButton=new Button("Import Demo Food Dataset (CSV)");
         importButton.setOnAction(e->{
@@ -40,7 +38,6 @@ public class MainApplication extends Application {
             };
             task.setOnSucceeded(event->{
                 importButton.setDisable(false);importButton.setText("Import Demo Food Dataset (CSV)");
-                try{controller.refreshFoodCatalogueAfterImport();}catch(Exception ignored){}
                 Alert alert=new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Demo import complete");alert.setHeaderText("Demo data import summary");
                 alert.setContentText(task.getValue().toString()+"\n\nIMPORTANT: Synthetic test data. It is not used by the nutrition calculator.");
