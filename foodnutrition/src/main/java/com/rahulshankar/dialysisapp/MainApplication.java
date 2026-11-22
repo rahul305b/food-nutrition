@@ -38,7 +38,7 @@ public class MainApplication extends Application {
                 alert.setContentText(ex.getMessage());alert.showAndWait();
             }
         });
-        Button profilesButton = new Button("View Imported Demo Profiles");\n        profilesButton.setOnAction(e -> DemoFoodProfileWindow.show(stage));\n        top.getChildren().add(new javafx.scene.layout.HBox(8, importButton, profilesButton));
+        top.getChildren().add(importButton);
         Scene scene = new Scene(root, 1000, 700);
         stage.setTitle("Renal Food Nutrition Calculator");
         stage.setMinWidth(820);
