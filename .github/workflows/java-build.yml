@@ -1,5 +1,8 @@
 name: Java Build Verification
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -23,4 +26,4 @@ jobs:
           java-version: '23'
           cache: maven
       - name: Compile and package
-        run: mvn -f foodnutrition/pom.xml --batch-mode clean package
+        run: mvn -f foodnutrition/pom.xml --batch-mode clean verify
