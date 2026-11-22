@@ -191,7 +191,9 @@ public class FoodPreparationController {
         Button saveButton = new Button("Save / Update Food");
         Button clearButton = new Button("Clear Form");
         Button deleteButton = new Button("Delete Selected");
-        HBox actions = new HBox(8, saveButton, clearButton, deleteButton);
+        Button importedProfilesButton = new Button("View Imported Profiles");
+        HBox actions = new HBox(8, saveButton, clearButton, deleteButton, importedProfilesButton);
+        importedProfilesButton.setOnAction(event -> com.rahulshankar.dialysisapp.DemoFoodProfileWindow.show(stage));
 
         Runnable clearForm = () -> {
             nameField.clear();
