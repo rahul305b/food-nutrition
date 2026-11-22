@@ -14,8 +14,8 @@ public final class DemoFoodProfileWindow {
         try {
             var rows = new DemoFoodProfileService().findProfiles();
             TableView<Map<String,String>> table = new TableView<>();
-            String[] keys = {"food_name","local_name","category","preparation","basis","energy_kcal","protein_g","carbohydrates_g","fat_g","fibre_g","potassium_mg","phosphorus_mg","sodium_mg","calcium_mg","magnesium_mg","iron_mg","data_status","source_name","source_record_id"};
-            String[] labels = {"Food","Tamil","Category","Preparation","Basis","Energy","Protein","Carbs","Fat","Fibre","Potassium","Phosphorus","Sodium","Calcium","Magnesium","Iron","Status","Source","Record ID"};
+            String[] keys = {"food_name","local_name","category","preparation","basis","energy_kcal","protein_g","carbohydrates_g","fat_g","fibre_g","potassium_mg","phosphorus_mg","sodium_mg","calcium_mg","magnesium_mg","iron_mg","data_status","source_name","source_record_id","citation","license_note"};
+            String[] labels = {"Food","Tamil","Category","Preparation","Basis","Energy","Protein","Carbs","Fat","Fibre","Potassium","Phosphorus","Sodium","Calcium","Magnesium","Iron","Status","Source","Record ID","Citation","Licence note"};
             for(int i=0;i<keys.length;i++) { final String key=keys[i]; TableColumn<Map<String,String>,String> col=new TableColumn<>(labels[i]); col.setCellValueFactory(d->new javafx.beans.property.SimpleStringProperty(d.getValue().get(key))); table.getColumns().add(col); }
             table.setItems(FXCollections.observableArrayList(rows)); table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
             Label warn=new Label("SYNTHETIC TEST DATA ONLY — NOT FOR DIETARY OR MEDICAL USE"); warn.setStyle("-fx-text-fill: #b00020; -fx-font-weight: bold;");
