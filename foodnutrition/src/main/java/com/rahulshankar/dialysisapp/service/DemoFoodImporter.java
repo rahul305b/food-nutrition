@@ -82,7 +82,7 @@ public class DemoFoodImporter {
         try{double v=Double.parseDouble(raw);if(!Double.isFinite(v)||v<0)throw new NumberFormatException();return v;}
         catch(NumberFormatException e){throw new IOException("CSV row "+rowNumber+", column "+column+": expected a finite non-negative number or blank; got '"+raw+"'.");}
     }
-    private static void setNullable(PreparedStatement p,int i,double value)throwsSQLException{if(Double.isNaN(value))p.setNull(i,Types.REAL);else p.setDouble(i,value);}
+    private static void setNullable(PreparedStatement p,int i,double value)throws SQLException{if(Double.isNaN(value))p.setNull(i,Types.REAL);else p.setDouble(i,value);}
     private static List<List<String>> readCsv(InputStream input)throws IOException{
         String content=new String(input.readAllBytes(),StandardCharsets.UTF_8);
         if(content.startsWith("\uFEFF"))content=content.substring(1);
