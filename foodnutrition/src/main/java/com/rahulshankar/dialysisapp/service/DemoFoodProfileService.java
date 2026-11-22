@@ -4,6 +4,21 @@ import java.sql.*;
 import java.util.*;
 
 public class DemoFoodProfileService {
+    /** Permanently removes only synthetic records from the dedicated demo database. */
+    public int deleteAllDemoProfiles() throws SQLException {
+        try(Connection c=DemoFoodDatabase.connect()) {
+            c.setAutoCommit(false);
+            try(Statement s=c.createStatement()) {
+                int count=s.executeUpdate("DELETE FROM demo_imported_foods");
+                s.executeUpdate("DELETE FROM demo_food_metadata");
+                s.executeUpdate("DELETE FROM food_nutrient_provenance");
+                c.commit();
+                return count;
+            } catch(SQLException e) { c.rollback(); throw e; }
+            finally { c.setAutoCommit(true); }
+        }
+    }
+
     public List<Map<String,String>> findProfiles() throws SQLException {
         List<Map<String,String>> rows=new ArrayList<>();
         String sql="SELECT food_name,local_name,category,preparation,basis,energy_kcal,protein_g,carbohydrates_g,fat_g,fibre_g,potassium_mg,phosphorus_mg,sodium_mg,calcium_mg,magnesium_mg,iron_mg,data_status,source_name,source_record_id,citation,license_note FROM demo_food_metadata ORDER BY food_name";
