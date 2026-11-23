@@ -19,7 +19,13 @@ public class DemoFoodImporter {
         if (records.isEmpty()) throw new IOException("CSV file is empty.");
         List<String> headers = records.get(0);
         Map<String,Integer> indexes = new HashMap<>();
-        for (int i=0;i<headers.size();i++) indexes.put(headers.get(i).trim().replace("\uFEFF",""),i);
+        for (int i=0;i<headers.size();i++) {
+            String header = headers.get(i).trim().replace("\uFEFF","");
+            // A repeated required column is ambiguous (which one is right?), so never let the last one win silently.
+            if (REQUIRED_HEADERS.contains(header) && indexes.put(header,i) != null)
+                throw new IOException("Duplicate CSV column: " + header);
+            indexes.putIfAbsent(header,i);
+        }
         for (String required : REQUIRED_HEADERS) {
             if (!indexes.containsKey(required)) throw new IOException("Missing required CSV column: " + required);
         }
@@ -69,7 +75,7 @@ public class DemoFoodImporter {
         }
         for(int i=0;i<3;i++){
             try(PreparedStatement p=c.prepareStatement("INSERT INTO food_nutrient_provenance(demo_id,food_name,nutrient,value,unit,source_name,source_record_id,data_status,citation,license_note,preparation,local_name,basis) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)")){
-                p.setString(1,id);p.setString(2,name);p.setString(3,nutrients[i]);setNullable(p,4,values[i]);p.setString(5,"mg");p.setString(6,source);p.setString(7,sourceId);p.setString(8,status);p.setString(9,citation);p.setString(10,license);p.setString(11,prep);p.setString(12,local);p.setString(13,basis);p.executeUpdate();
+                p.setString(1,id);p.setString(2,name);p.setString(3,nutrients[i]);setNullable(p,4,values[i]);p.setString(5,"mg");p.setString(6,nullableText(source));p.setString(7,nullableText(sourceId));p.setString(8,nullableText(status));p.setString(9,nullableText(citation));p.setString(10,nullableText(license));p.setString(11,nullableText(prep));p.setString(12,nullableText(local));p.setString(13,nullableText(basis));p.executeUpdate();
             }
         }
     }
@@ -79,12 +85,27 @@ public class DemoFoodImporter {
     private static double numeric(List<String> row,Map<String,Integer> ix,String column,int rowNumber)throws IOException{
         String raw=get(row,ix,column);
         if(raw.isBlank()||raw.equalsIgnoreCase("null")||raw.equalsIgnoreCase("na")||raw.equalsIgnoreCase("n/a"))return Double.NaN;
-        try{double v=Double.parseDouble(raw);if(!Double.isFinite(v)||v<0)throw new NumberFormatException();return v;}
-        catch(NumberFormatException e){throw new IOException("CSV row "+rowNumber+", column "+column+": expected a finite non-negative number or blank; got '"+raw+"'.");}
+        // Double.parseDouble alone is too lenient: it accepts "12.5f", "12.5d", hex floats like "0x1p3" and "-0".
+        if(PLAIN_NUMBER.matcher(raw).matches()){
+            double v=Double.parseDouble(raw);
+            if(Double.isFinite(v))return v;          // "1e999" matches the grammar but overflows to Infinity
+        }
+        throw new IOException("CSV row "+rowNumber+", column "+column+": expected a finite non-negative number or blank; got '"+raw+"'.");
     }
+    /** Optional '+', digits with optional fraction (or a leading-dot fraction), optional exponent. No sign '-', suffixes, hex or words. */
+    private static final java.util.regex.Pattern PLAIN_NUMBER=java.util.regex.Pattern.compile("\\+?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([eE][+-]?[0-9]+)?");
     private static void setNullable(PreparedStatement p,int i,double value)throws SQLException{if(Double.isNaN(value))p.setNull(i,Types.REAL);else p.setDouble(i,value);}
     private static List<List<String>> readCsv(InputStream input)throws IOException{
-        String content=new String(input.readAllBytes(),StandardCharsets.UTF_8);
+        // Decode strictly: new String(bytes, UTF_8) would silently replace bad bytes (e.g. a Windows-1252 file) with U+FFFD.
+        String content;
+        try{
+            content=StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+                    .decode(java.nio.ByteBuffer.wrap(input.readAllBytes())).toString();
+        }catch(java.nio.charset.CharacterCodingException e){
+            throw new IOException("CSV file is not valid UTF-8 text. Save it as \"CSV UTF-8\" and try again.",e);
+        }
         if(content.startsWith("\uFEFF"))content=content.substring(1);
         List<List<String>> rows=new ArrayList<>();List<String> row=new ArrayList<>();StringBuilder field=new StringBuilder();boolean quoted=false;
         for(int i=0;i<content.length();i++){char ch=content.charAt(i);

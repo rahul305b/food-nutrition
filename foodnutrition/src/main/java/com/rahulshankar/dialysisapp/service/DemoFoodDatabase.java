@@ -34,7 +34,36 @@ public final class DemoFoodDatabase {
         }
     }
 
+    /** Schema version stored in {@code PRAGMA user_version}. Bump it and extend {@link #migrate} for every schema change. */
+    static final int SCHEMA_VERSION = 1;
+
+    /**
+     * Brings the database up to {@link #SCHEMA_VERSION}. An up-to-date database is left completely untouched, so opening
+     * a connection (for example from the profile viewer) never takes a write lock while an import is running. The
+     * migration itself runs in one transaction, so a failure cannot leave a half-upgraded schema behind.
+     */
     private static void initialize(Connection connection) throws SQLException {
+        if (userVersion(connection) >= SCHEMA_VERSION) return;
+        connection.setAutoCommit(false);
+        try {
+            migrate(connection);
+            connection.commit();
+        } catch (SQLException | RuntimeException e) {
+            try { connection.rollback(); } catch (SQLException rollbackError) { e.addSuppressed(rollbackError); }
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+
+    private static int userVersion(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet result = statement.executeQuery("PRAGMA user_version")) {
+            return result.next() ? result.getInt(1) : 0;
+        }
+    }
+
+    private static void migrate(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE IF NOT EXISTS demo_imported_foods (" +
                     "demo_id TEXT PRIMARY KEY, food_name TEXT NOT NULL, " +
@@ -68,7 +97,7 @@ public final class DemoFoodDatabase {
             statement.executeUpdate("UPDATE demo_food_metadata SET sodium_mg = " +
                     "(SELECT value FROM food_nutrient_provenance p WHERE p.demo_id=demo_food_metadata.demo_id " +
                     "AND p.nutrient='sodium_mg') WHERE sodium_mg IS NULL");
-            statement.execute("PRAGMA user_version = 1");
+            statement.execute("PRAGMA user_version = " + SCHEMA_VERSION);
         }
     }
 
